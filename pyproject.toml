@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "encor"
-version = "1.1.4"
+version = "1.1.5"
 authors = [{name="Daniel Foreman-Mackey and Jonathan Goodman", email="danfm@nyu.edu"},]
 maintainers = [{name="David Wright", email="david.wright@nanograv.org"}]
 description="Estimate the autocorrelation time of a time series quickly."

@@ -2,6 +2,7 @@
  * Written by: Dan Foreman-Mackey - danfm@nyu.edu
  */
 
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
@@ -44,7 +45,7 @@ static PyObject *acor_acor(PyObject *self, PyObject *args)
 {
     int i, j, N, ndim, info, maxlag;
     double *data;
-    PyObject *data_array;
+    PyArrayObject *data_array = NULL;
 
     /* Return value */
     PyObject *ret;
@@ -57,7 +58,7 @@ static PyObject *acor_acor(PyObject *self, PyObject *args)
         return NULL;
 
     /* Get the data as a numpy array object */
-    data_array  = PyArray_FROM_OTF(data_obj, NPY_DOUBLE, NPY_IN_ARRAY);
+    data_array  = (PyArrayObject *)PyArray_FROM_OTF(data_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
     if (data_array == NULL) {
         PyErr_SetString(PyExc_TypeError, "The input data must be a numpy.ndarray.");
         Py_XDECREF(data_array);
@@ -136,8 +137,8 @@ static PyObject *acor_function(PyObject *self, PyObject *args)
     int ndim, ndim_out, N, N_out;
     double *data, *out_data;
     double mean;
-    PyObject *data_array;
-    PyObject *out_array;
+    PyArrayObject *data_array = NULL;
+    PyArrayObject *out_array = NULL;
 
     /* Parse the input tuple */
     PyObject *data_obj, *out_obj;
@@ -145,13 +146,14 @@ static PyObject *acor_function(PyObject *self, PyObject *args)
         return NULL;
 
     /* Get the data as a numpy array object */
-    data_array = PyArray_FROM_OTF(data_obj, NPY_DOUBLE, NPY_IN_ARRAY);
-    out_array = PyArray_FROM_OTF(out_obj, NPY_DOUBLE, NPY_OUT_ARRAY);
-    if (data_array == NULL || out_array == NULL) {
-        PyErr_SetString(PyExc_TypeError,
-                "The input data must be a numpy.ndarrays.");
-        Py_XDECREF(data_array);
-        Py_XDECREF(out_array);
+    data_array = (PyArrayObject *)PyArray_FROM_OTF(data_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
+    if (data_array == NULL) {
+        return NULL;
+    }
+
+    out_array = (PyArrayObject *)PyArray_FROM_OTF(out_obj, NPY_DOUBLE, NPY_ARRAY_OUT_ARRAY);
+    if (out_array == NULL) {
+        Py_DECREF(data_array);
         return NULL;
     }
 
